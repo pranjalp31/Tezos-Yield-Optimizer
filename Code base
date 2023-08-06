@@ -1,0 +1,98 @@
+npx create-react-app tezos-yield-optimizer
+cd tezos-yield-optimizer
+
+npm install @taquito/taquito @taquito/beacon-wallet axios
+
+// src/App.js
+import React, { useState } from 'react';
+import { BeaconWallet } from '@taquito/beacon-wallet';
+import { TezosToolkit } from '@taquito/taquito';
+import { NetworkType } from '@airgap/beacon-sdk';
+import './App.css';
+
+const Tezos = new TezosToolkit(process.env.REACT_APP_RPC_URL);
+
+function App() {
+  const [wallet, setWallet] = useState(null);
+  const [connected, setConnected] = useState(false);
+  const [assetName, setAssetName] = useState('');
+  const [assetAmount, setAssetAmount] = useState('');
+  const [tradeAmount, setTradeAmount] = useState('');
+  const [tradeType, setTradeType] = useState('buy');
+
+  const connectWallet = async () => {
+    const newWallet = new BeaconWallet({ name: 'Tezos Yield Optimizer' });
+    await newWallet.requestPermissions({
+      network: {
+        type: NetworkType.MAINNET,
+        rpcUrl: process.env.REACT_APP_RPC_URL,
+      },
+    });
+    Tezos.setWalletProvider(newWallet);
+    setWallet(newWallet);
+    setConnected(true);
+  };
+
+  const handleTokenize = async (event) => {
+    event.preventDefault();
+  };
+
+  const handleTrade = async (event) => {
+    event.preventDefault();
+  };
+
+  return (
+    <div className="App">
+      <h1>Tezos Yield Optimizer</h1>
+      {!connected ? (
+        <button onClick={connectWallet}>Connect Wallet</button>
+      ) : (
+        <div>
+          <h2>Connected to Wallet</h2>
+          <div>
+            <h3>Tokenize Asset</h3>
+            <form onSubmit={handleTokenize}>
+              <label htmlFor="asset-name">Asset Name:</label>
+              <input type="text" id="asset-name" value={assetName} onChange={(e) => setAssetName(e.target.value)} required />
+              <label htmlFor="asset-amount">Asset Amount:</label>
+              <input type="number" id="asset-amount" value={assetAmount} onChange={(e) => setAssetAmount(e.target.value)} required />
+              <button type="submit">Tokenize</button>
+            </form>
+          </div>
+          <div>
+            <h3>AMM Trading</h3>
+            <form onSubmit={handleTrade}>
+              <label htmlFor="trade-amount">Trade Amount:</label>
+              <input type="number" id="trade-amount" value={tradeAmount} onChange={(e) => setTradeAmount(e.target.value)} required />
+              <label htmlFor="trade-type">Trade Type:</label>
+              <select id="trade-type" value={tradeType} onChange={(e) => setTradeType(e.target.value)}>
+                <option value="buy">Buy</option>
+                <option value="sell">Sell</option>
+              </select>
+              <button type="submit">Trade</button>
+            </form>
+          </div>
+          {/* Add other components here */}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
+
+/* src/App.css */
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+button {
+  margin-bottom: 10px;
+}
+
+npm start
