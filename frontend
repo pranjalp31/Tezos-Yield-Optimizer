@@ -1,0 +1,116 @@
+npx create-react-app tezos-yield-optimizer
+cd tezos-yield-optimizer
+
+npm install @taquito/taquito @taquito/beacon-wallet axios
+
+// components/TokenizeAsset.js
+import React, { useState } from 'react';
+
+const TokenizeAsset = () => {
+  const [assetName, setAssetName] = useState('');
+  const [assetAmount, setAssetAmount] = useState('');
+
+  const handleTokenize = async (event) => {
+    event.preventDefault();
+  };
+
+  return (
+    <div>
+      <h2>Tokenize Asset</h2>
+      <form onSubmit={handleTokenize}>
+        <label htmlFor="asset-name">Asset Name:</label>
+        <input type="text" id="asset-name" value={assetName} onChange={(e) => setAssetName(e.target.value)} required />
+        <label htmlFor="asset-amount">Asset Amount:</label>
+        <input type="number" id="asset-amount" value={assetAmount} onChange={(e) => setAssetAmount(e.target.value)} required />
+        <button type="submit">Tokenize</button>
+      </form>
+    </div>
+  );
+};
+
+export default TokenizeAsset;
+
+// components/AMMTrading.js
+import React, { useState } from 'react';
+
+const AMMTrading = () => {
+  const [tradeAmount, setTradeAmount] = useState('');
+  const [tradeType, setTradeType] = useState('buy');
+
+  const handleTrade = async (event) => {
+    event.preventDefault();
+  };
+
+  return (
+    <div>
+      <h2>AMM Trading</h2>
+      <form onSubmit={handleTrade}>
+        <label htmlFor="trade-amount">Trade Amount:</label>
+        <input type="number" id="trade-amount" value={tradeAmount} onChange={(e) => setTradeAmount(e.target.value)} required />
+        <label htmlFor="trade-type">Trade Type:</label>
+        <select id="trade-type" value={tradeType} onChange={(e) => setTradeType(e.target.value)}>
+          <option value="buy">Buy</option>
+          <option value="sell">Sell</option>
+        </select>
+        <button type="submit">Trade</button>
+      </form>
+    </div>
+  );
+};
+
+export default AMMTrading;
+
+// src/tezos.js
+import { BeaconWallet } from '@taquito/beacon-wallet';
+import { TezosToolkit } from '@taquito/taquito';
+import { NetworkType } from '@airgap/beacon-sdk';
+
+const Tezos = new TezosToolkit(process.env.REACT_APP_RPC_URL);
+
+export const connectWallet = async () => {
+  const wallet = new BeaconWallet({ name: 'Tezos Yield Optimizer' });
+  await wallet.requestPermissions({
+    network: {
+      type: NetworkType.MAINNET,
+      rpcUrl: process.env.REACT_APP_RPC_URL,
+    },
+  });
+  Tezos.setWalletProvider(wallet);
+  return wallet;
+};
+
+export const tokenizeAsset = async (assetName, assetAmount) => {
+};
+
+export const tradeAMM = async (tradeAmount, tradeType) => {
+};
+
+
+// src/App.js
+import React from 'react';
+import { connectWallet, tokenizeAsset, tradeAMM } from './tezos';
+import TokenizeAsset from './components/TokenizeAsset';
+import AMMTrading from './components/AMMTrading';
+
+function App() {
+  const handleConnectWallet = async () => {
+    const wallet = await connectWallet();
+    // You can update the UI to show that the user is connected to the wallet
+  };
+
+  return (
+    <div>
+      <h1>Tezos Yield Optimizer</h1>
+      <button onClick={handleConnectWallet}>Connect Wallet</button>
+      <TokenizeAsset />
+      <AMMTrading />
+      {/* Add other components here */}
+    </div>
+  );
+}
+
+export default App;
+
+npm start
+
+
